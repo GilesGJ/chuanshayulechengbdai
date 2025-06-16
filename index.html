@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>庄闲记录系统</title>
+    <style>
+        .banker { color: red; }
+        .player { color: blue; }
+        .tie { color: green; }
+        #records { max-height: 500px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>庄闲记录系统</h1>
+    <div>
+        <button onclick="recordResult('banker')">庄</button>
+        <button onclick="recordResult('player')">闲</button>
+        <button onclick="recordResult('tie')">和</button>
+    </div>
+    <div id="records"></div>
+    <script>
+        async function recordResult(type) {
+            await fetch('https://your-worker-url/api/record', {
+                method: 'POST',
+                body: JSON.stringify({ type })
+            });
+            updateRecords();
+        }
+
+        async function updateRecords() {
+            const response = await fetch('https://your-worker-url/api/records');
+            const records = await response.json();
+            const recordsDiv = document.getElementById('records');
+            recordsDiv.innerHTML = records.map(r => 
+                `<div class="${r.type}">${r.type} - ${new Date(r.timestamp).toLocaleString()}</div>`
+            ).join('');
+        }
+
+        setInterval(updateRecords, 1000);
+    </script>
+</body>
+</html>
