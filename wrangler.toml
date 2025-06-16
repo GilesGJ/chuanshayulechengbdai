@@ -3,5 +3,5 @@
 compatibility_date = "2025-06-16"
 
 kv_namespaces = [
-    { binding = "KV_STORE", id = "your-kv-namespace-id" }
+    { binding = "KV_STORE", id = "c103214dd8744154a6269d0d00895613" }
 ]
