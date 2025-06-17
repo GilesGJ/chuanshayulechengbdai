@@ -1,42 +1,72 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <title>庄闲记录系统</title>
-    <style>
-        .banker { color: red; }
-        .player { color: blue; }
-        .tie { color: green; }
-        #records { max-height: 500px; overflow-y: auto; }
-    </style>
+  <meta charset="UTF-8" />
+  <title>百家乐记录</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f0f2f5;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #banker { background: red; color: white; }
+    #player { background: blue; color: white; }
+    #tie    { background: green; color: white; }
+    .record {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      margin: 3px;
+      border-radius: 50%;
+    }
+  </style>
 </head>
 <body>
-    <h1>庄闲记录系统</h1>
-    <div>
-        <button onclick="recordResult('banker')">庄</button>
-        <button onclick="recordResult('player')">闲</button>
-        <button onclick="recordResult('tie')">和</button>
-    </div>
-    <div id="records"></div>
-    <script>
-        async function recordResult(type) {
-            await fetch('https://your-worker-url/api/record', {
-                method: 'POST',
-                body: JSON.stringify({ type })
-            });
-            updateRecords();
-        }
+  <h2>百家乐记录系统</h2>
+  <div>
+    <button id="banker" onclick="send('banker')">庄</button>
+    <button id="player" onclick="send('player')">闲</button>
+    <button id="tie" onclick="send('tie')">和</button>
+  </div>
+  <h3>最近记录（最新在前）</h3>
+  <div id="history"></div>
 
-        async function updateRecords() {
-            const response = await fetch('https://your-worker-url/api/records');
-            const records = await response.json();
-            const recordsDiv = document.getElementById('records');
-            recordsDiv.innerHTML = records.map(r => 
-                `<div class="${r.type}">${r.type} - ${new Date(r.timestamp).toLocaleString()}</div>`
-            ).join('');
-        }
+  <script>
+    const api = "https://baccarat-api.xxx.workers.dev"; // 替换成你的后端地址
 
-        setInterval(updateRecords, 1000);
-    </script>
+    async function send(type) {
+      await fetch(api + "/record", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type })
+      });
+      loadHistory();
+    }
+
+    async function loadHistory() {
+      const res = await fetch(api + "/history");
+      const list = await res.json();
+      const historyDiv = document.getElementById("history");
+      historyDiv.innerHTML = "";
+      list.forEach(item => {
+        const el = document.createElement("div");
+        el.className = "record";
+        if (item.type === "banker") el.style.background = "red";
+        if (item.type === "player") el.style.background = "blue";
+        if (item.type === "tie")    el.style.background = "green";
+        historyDiv.appendChild(el);
+      });
+    }
+
+    loadHistory();
+  </script>
 </body>
 </html>
